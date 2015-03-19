@@ -169,6 +169,15 @@ class SignallingTestCase(unittest.TestCase):
             self.assertEqual(recorded[0][0], todo)
             self.assertEqual(recorded[0][1], 'delete')
 
+    def test_session_events(self):
+        from sqlalchemy.event import listens_for
+
+        seen = []
+        register = listens_for(self.db.session, 'after_commit')
+        register(seen.append)
+
+        self.db.session.commit()
+        self.assertEqual(seen, [self.db.session()])
 
 class TablenameTestCase(unittest.TestCase):
     def test_name(self):
